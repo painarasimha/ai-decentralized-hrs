@@ -50,8 +50,13 @@ export async function PATCH(req: NextRequest) {
     data: { status: body.status, respondedAt: new Date() },
   });
 
-  if (body.status === 'APPROVED' && Array.isArray(body.recordIds)) {
-    for (const recordId of body.recordIds) {
+  if (body.status === 'APPROVED') {
+    const recordIds: string[] = Array.isArray(body.recordIds)
+      ? body.recordIds
+      : (await prisma.healthRecord.findMany({ where: { patientId: updated.patientId }, select: { id: true } }))
+          .map((r) => r.id);
+
+    for (const recordId of recordIds) {
       await prisma.accessGrant.upsert({
         where: { recordId_granteeId: { recordId, granteeId: updated.requesterId } },
         update: {},

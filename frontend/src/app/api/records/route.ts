@@ -61,6 +61,15 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // Ensure doctors can see their own uploads: grant access to this new record
+  if (role === 'DOCTOR') {
+    await prisma.accessGrant.upsert({
+      where: { recordId_granteeId: { recordId: created.id, granteeId: userId } },
+      update: {},
+      create: { recordId: created.id, granteeId: userId, grantedById: userId },
+    });
+  }
+
   await prisma.auditLog.create({
     data: { actorId: userId, action: 'UPLOAD_RECORD', targetId: created.id, meta: { title } as any },
   });

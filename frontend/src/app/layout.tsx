@@ -32,8 +32,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Link href="/upload">Upload</Link>
             <Link href="/consents">Consents</Link>
           </nav>
-          <div>
-            {!session ? <Link href="/signin">Sign in</Link> : <span>{session.user?.email}</span>}
+          <div className="space-x-3">
+            {!session ? (
+              <Link href="/signin">Sign in</Link>
+            ) : (
+              <>
+                <span>{session.user?.email}</span>
+                <Link href="/api/auth/signout">Sign out</Link>
+              </>
+            )}
           </div>
         </header>
         <main className="container mx-auto">{children}</main>
